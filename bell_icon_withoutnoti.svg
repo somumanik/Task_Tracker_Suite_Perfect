@@ -1,0 +1,14 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 730" width="730" height="730">
+	<title>bell_icon</title>
+	<style>
+		.s0 { fill: #091c39 } 
+	</style>
+	<filter id="f0">
+		<feFlood flood-color="#0b1d38" flood-opacity="1" />
+		<feBlend mode="normal" in2="SourceGraphic"/>
+		<feComposite in2="SourceAlpha" operator="in" />
+	</filter>
+	<g id="surface1" filter="url(#f0)">
+		<path class="s0" d="m192.1 628v2.9c16 58.4 69.1 98.9 129.6 98.9 60.5 0 113.5-40.5 129.5-98.9v-2.9zm337.5-224.7h-3.4v-115.6c0.3-99.5-71.7-184.6-169.9-200.6h-4.2v-41.5c1.4-11.4-3.9-22.6-13.7-28.8-9.7-6.1-22.1-6.1-31.8 0-9.8 6.2-15.1 17.4-13.7 28.8v41.5h-4.2c-98.2 16-170.2 101.1-169.9 200.6v114.4h-3.4c-40.4 14-67.2 52.5-66.3 95.3v69.7c0 16.2 13.2 29.4 29.4 29.4h488c16.2 0 29.4-13.2 29.4-29.4v-69.7c0.4-42.3-26.3-80.2-66.3-94.1z"/>
+	</g>
+</svg>

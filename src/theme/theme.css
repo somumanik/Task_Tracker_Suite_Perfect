@@ -1,0 +1,71 @@
+/**
+ * ============================================================
+ * theme.css — FIRST-PAINT FALLBACK TOKENS
+ *
+ * PURPOSE: JavaScript load hone SE PEHLE bhi page ka rang sahi
+ *   dikhe (no flash of unstyled/wrong-color page — FOUC).
+ *
+ * WORKING: Ocean (default theme) ke values :root par define hain.
+ *   ThemeProvider mount hote hi saved/selected theme ke values
+ *   inline style se override kar deta hai (inline > stylesheet).
+ *
+ * NOTE: Ye values themes.ts (source of truth) ke "ocean" entry
+ *   ke duplicate hain — sirf first-paint ke liye. Theme badalne
+ *   par sirf ThemeProvider vars update karta hai, ye file nahi.
+ *
+ * USAGE: root layout mein isko import karo:
+ *   import '@/theme/theme.css';
+ * ============================================================
+ */
+
+:root {
+  /* ---- semantic color tokens (Ocean = default) ---- */
+  --color-primary: #0284c7;
+  --color-primary-contrast: #ffffff;
+  --color-secondary: #06b6d4;
+  --color-background: #f0f7fb;
+  --color-surface: #ffffff;
+  --color-surface-muted: #e6f1f8;
+  --color-text: #0f172a;
+  --color-muted: #64748b;
+  --color-border: #d3e3ee;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #0284c7;
+  --color-focus: #0ea5e9;
+
+  /* ---- non-color tokens (src/theme/tokens.ts se match) ---- */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 12px 32px -8px rgba(0, 0, 0, 0.16);
+}
+
+/* Global base styling — original design (reference CSS copy NAHI). */
+html,
+body {
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/* Accessibility: keyboard focus hamesha dikhe (WCAG). */
+*:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Respect user's reduced-motion preference (a11y requirement). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

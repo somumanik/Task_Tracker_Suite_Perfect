@@ -1,0 +1,904 @@
+const chatbox = jQuery.noConflict();
+
+chatbox(() => {
+	
+	
+	chatbox(".chatbox-open").click(() =>								// chatbox open click
+ 	chatbox(".chatbox-popup, .chatbox-close,.sectionDiv,.chatbox-popup__main").fadeIn()
+  );
+  
+/*
+  chatbox(".chatbox-close").click(() =>
+    chatbox(".chatbox-popup, .chatbox-close,.sectionDiv").fadeOut()					// // chatbox close click
+  );*/
+  chatbox(".chatbox-close,.sectionDiv").click(() => {
+    chatbox(".chatbox-popup, .chatbox-close,.chatbox-panel_group,.chatbox-panel_updategroup,.chatbox-panel_group, .chatbox-panel, .sectionDiv").fadeOut(); // // chatbox close click;
+    chatbox(".chatbox-open").fadeIn();
+				$("input[name='chat_connection_id_new']").val(0);
+				$("input[name='chat_to_user_new']").val(0);
+                $("input[name='last_chat_id_new']").val(0);	
+				$("input[name='clickonicon']").val(0);	
+	
+  });
+  
+ chatbox(".chatbox-maximize").click(() => {
+    chatbox(".chatbox-popup, .chatbox-open, .chatbox-close").fadeOut();
+    chatbox(".chatbox-panel").fadeIn();
+    chatbox(".chatbox-panel").css({ display: "flex" });
+	
+	
+  });
+  
+  chatbox(".chatbox-minimizeupdate").click(() => {
+    chatbox(".chatbox-popup, .chatbox-open, .chatbox-close,.chatbox-panel_updategroup").fadeOut();
+    chatbox(".chatbox-panel").fadeIn();
+    chatbox(".chatbox-panel").css({ display: "flex" });
+	getChatsUpdates();
+	
+	
+  });
+   chatbox(".chatbox-panel-close,.chatbox-panel-close1,.chatbox-panel-close2").click(() => {
+    chatbox(".chatbox-panel").fadeOut();
+    chatbox(".chatbox-open").fadeIn();
+				$("input[name='chat_connection_id_new']").val(0);
+				$("input[name='chat_to_user_new']").val(0);
+                $("input[name='last_chat_id_new']").val(0);	
+				$("input[name='clickonicon']").val(0);	
+  });
+  
+  
+  chatbox(".chatbox-minimize").click(() => {
+    chatbox(".chatbox-panel,.chatbox-panel_group").fadeOut();
+    chatbox(".chatbox-popup, .chatbox-popup__main ul, .chatbox-open, .chatbox-close").fadeIn();
+	chatbox(".chatbox-popup__main").css({ display: "flex" });
+	recentchatlist();
+  });
+  
+  chatbox(".groupchatcreate").click(() => {
+    chatbox(".chatbox-popup").fadeOut();
+    chatbox(".chatbox-panel_group, .chatbox-open").fadeIn();
+	chatbox(".chatbox-close").fadeOut();
+  });
+
+
+
+   
+});
+
+ var interval;
+    var intervalchat;
+    var intervalchatnew;
+	
+	$(document).on('input','.chat_input_new',function(){
+     if ($.trim($(this).val()) == '') {
+        $('.input_submit_new').prop('disabled', true);
+    }else{
+        $('.input_submit_new').prop('disabled', false);
+    }
+});
+$('.input_submit_new').click(function (e) {
+		
+                newChatMessage();
+        
+		
+	});
+
+
+
+  var date_time_temp = "";
+	  
+    function updateTime() {
+		
+		var chat_connection_id = $("input[name='chat_connection_id_new']").val();
+		var chat_to_user = $("input[name='chat_to_user_new']").val();
+        var last_chat_id = $("input[name='last_chat_id_new']").val();
+		 var clickonicon = $("input[name='clickonicon']").val();
+		 //+" "+js_yyyy_mm_dd_hh_mm_ss_new(Date(timestamp)).substr(20,22)
+       date_time_temp = js_yyyy_mm_dd_hh_mm_ss_new(Date(timestamp)).substr(20,21);
+		$.ajax({
+            type: "POST",
+            url: purl+'chat/mychatnotification',
+            data: {},
+            dataType: "JSON",
+            beforeSend: function () 
+			{
+
+            },
+			
+            success: function (data) {
+				
+				
+			//console.log(data);
+			
+				if(data.status=='2')
+				{
+					
+				window.location.href="https://tasktracker.in/app/login";	
+				return false;
+					
+				}
+				else
+				{
+			$("#chatbox_opens").html(""); 
+			if(data.notifications>0 && chat_connection_id==0)
+			{
+			//console.log(chat_connection_id);
+			console.log("Sound Notifications-"+data.soundnotification);
+			console.log("data Notifications count -"+data.notifications);
+			
+			if(data.notifications>data.soundnotification)
+			{
+				
+				
+			var audio = new Audio(purl+'assets/voice/chat_seen.mp3');
+			audio.play();
+			
+			$.ajax({
+
+          type: 'POST',
+
+          url: purl+'chat/switchsoundnotification',
+
+          data: {'soundnotificationcount':data.notifications},
+
+          success: function(response){
+			//alert(response);
+            console.log("cookies value----"+response);
+            //location.reload();
+          },
+
+        });
+			
+			}
+			
+			
+			
+			
+			$("#chatbox_opens").show();
+			$("#chatbox_opens").html(data.notifications);   
+			}
+			else if(clickonicon>0)
+			{
+				
+            }
+			recentchatlist();
+				
+				console.clear();
+			getChatsUpdates();	
+			}
+		   //
+			
+			},
+            error: function (jqXHR, textStatus, errorThrown) {
+
+            },
+            complete: function (data) 
+			{
+
+            }
+        });
+		
+		timestamp++;
+		
+    }
+	
+/*----------------GET RECENT CHAT UPDATES START HERE----------------------------------*/
+
+function recentchatlist()
+{
+	 var clickonicon = $("input[name='clickonicon']").val();
+	
+	$.ajax({
+            type: "POST",
+            url: purl+'chat/myuserforweb',
+            data: {1:1},
+            dataType: "JSON",
+			 beforeSend: function(){
+                             
+							 $('#loading_process_smallchat').css('display','block');
+							 
+                           },
+            success: function (data) 
+			{
+		
+				 $(".chatbox-popup__main ul").html(data.page);
+				 $('#loading_process_smallchat').css('display','none');
+                if (data.status === "1") {
+
+                }
+            }
+           
+        });
+	
+	
+	
+	
+}
+
+/*----------------GET RECENT CHAT UPDATES END HERE----------------------------------*/	
+
+	
+	
+	
+	
+	/*----------------GET CURRENT TIME FUNCTION START HERE----------------------------------*/		
+function js_yyyy_mm_dd_hh_mm_ss_new(now) {
+
+        var date_format = datetimedata;
+        var new_str = date_format;
+        var month_String = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+        now = new Date();
+        var day = String(now.getDate()).padStart(2, '0');
+        var month = String(now.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var year = now.getFullYear();
+        hour = "" + now.getHours();
+        if (hour.length == 1) {
+            hour = "0" + hour;
+        }
+        minute = "" + now.getMinutes();
+        if (minute.length == 1) {
+            minute = "0" + minute;
+        }
+        second = "" + now.getSeconds();
+        if (second.length == 1) {
+            second = "0" + second;
+        }
+        var inputAttr = {};
+        inputAttr["m"] = month;
+        inputAttr["M"] = month_String[now.getMonth()];
+        inputAttr["d"] = day;
+        inputAttr["Y"] = year;
+        for (var key in inputAttr) {
+            if (!inputAttr.hasOwnProperty(key)) {
+                continue;
+            }
+            new_str = new_str.replace(key, inputAttr[key]);
+        }
+        return new_str + " " + hour + ":" + minute;
+		
+    }
+
+
+/*----------------GET CURRENT TIME FUNCTION END HERE----------------------------------*/	
+
+	
+/*----------------GET NEW CHAT INTO CHAT BOX END HERE----------------------------------*/	
+$(document).on('keypress', '.chat_input_new', function (e) {
+if (e.which === 13) {
+e.preventDefault();
+sendMessage();
+}
+});
+
+let isSending = false;
+
+function sendMessage() {
+
+    if (isSending) return;
+
+    let message = $.trim($('.chat_input_new').val());
+
+    if (message === '') return;
+
+    isSending = true;
+
+    $('.input_submit_new').prop('disabled', true);
+
+    newChatMessage();
+}
+
+/*
+$(document).on('keydown', '.chat_input_new', function (e) {
+        switch (e.which) {
+            case 13:
+                newChatMessage();
+                break;
+        }
+    });
+	*/
+	
+ function htmlEncode(str) {
+        return String(str).replace(/[^\w. ]/gi, function (c) {
+            return '&#' + c.charCodeAt(0) + ';';
+        });
+    }
+	function newChatMessage() {
+		//var message;
+        var message = htmlEncode($("#chat_input_new").val());
+		$('.input_submit_new').prop('disabled', true);
+        if ($.trim(message) == '') {
+            return false;
+        }
+
+        var chat_connection_id = $("input[name='chat_connection_id_new']").val();
+        var chat_to_user = $("input[name='chat_to_user_new']").val();
+        if (chat_connection_id > 0) {
+
+            $.ajax({
+                type: "POST",
+                url: purl+'chat/newMessage',
+                data: {'chat_connection_id': chat_connection_id, 'message': message, 'chat_to_user': chat_to_user, 'time': date_time_temp},
+                dataType: "JSON",
+                beforeSend: function () {
+
+                },
+                success: function (data) {
+					//alert(data.last_insert_id);
+					$("input[name='last_chat_id_new']").val(data.last_insert_id);//
+                    $('<li class="replies"><p>' + message + '</p> <span class="time_date_send">' + data.created_at + '</span></li>').appendTo($('.messages ul'));
+                    $('.chat_input_new').val(null);
+                    //$('.contact.active .preview').html('<span><?php echo 'you'; ?>: </span>' + message);
+                    $('.messages ul').animate({
+                        scrollTop: $('.messages ul')[0].scrollHeight}, "slow");
+				  }, 
+				complete: function () {
+            // Allow next send
+            isSending = false;
+        }
+				 
+				
+            });
+        }
+    };
+
+
+/*----------------GET NEW CHAT INTO CHAT BOX START HERE----------------------------------*/	
+
+/*----------------GET RECENT CHAT LIST START HERE----------------------------------*/
+	
+$("#getchatuser, #chatbox-minimize").click(function(event){
+ $("input[name='contactid']").val(0);
+ $("input[name='contactvalue']").val(0);
+ $("input[name='clickonicon']").val(1);
+
+ recentchatlist();
+  var clickonicon_new = $("input[name='clickonicon']").val();
+
+	if(clickonicon_new>0)
+	{
+		
+		$("#getuserchat option").remove();
+
+  $.ajax({
+            type: "POST",
+            url: purl+'chat/myuserforweb',
+            data: {1:1},
+            dataType: "JSON",
+            success: function (data) 
+			{
+		
+			$('#getuserchat').append(data.employeelist);
+			 console.clear();
+	
+	
+	 }
+	 });
+	 
+	}
+				$("input[name='chat_connection_id_new']").val(0);
+				
+                $("input[name='chat_to_user_new']").val(0);
+                $("input[name='last_chat_id_new']").val(0);	
+				$("input[name='clickonicon']").val(0);	
+	
+	
+				
+});	
+
+
+/*----------------GET RECENT CHAT LIST END HERE----------------------------------*/	
+
+
+/*----------------GET CHAT BOX  FROM SELECT TAG START HERE----------------------------------*/	
+function getuserchat(textvalue)
+{
+		  $(".profile_photo img").remove();
+	      $(".profile_photo div").remove();
+          $(".profile_photo").append(
+            "<img style='height: 40px;width: 40px;border-radius: 100%' src=" +
+              purl +
+              "'assets/img/no_image.png'>"
+          );
+	var optvalue="";
+	var fullname=textvalue.options[textvalue.selectedIndex].text;
+	var optvalues=textvalue.options[textvalue.selectedIndex].value;
+	var optvalue=$("#getuserchat").val();
+	if(optvalue!='')
+	{
+	   $.ajax({
+            type: "POST",
+            url: purl+'chat/getChatRecordweb_new',
+            data: {'chat_connection_id': optvalue},
+            dataType: "JSON",
+            success: function (data) {
+			console.log(data);
+			chatbox(".chatbox-popup, .chatbox-open, .chatbox-close").fadeOut();
+			chatbox(".chatbox-panel").fadeIn();
+			chatbox(".chatbox-panel").css({ display: "flex" });
+			    //$this.find('span.notification_count').css("display", "none");
+                $(".messages ul").html(data.page);
+				$("#chatusername").html(fullname);
+				if(data.photo!=''){
+
+						img = purl+"upload/"+data.photo;
+						}
+						else
+						{
+						img = purl+"assets/img/no_image.png";	                        
+						}
+				 $('.profile_photo').find('img').attr("src", img);
+                $("input[name='chat_connection_id_new']").val(data.chat_connection_id);
+                $("input[name='chat_to_user_new']").val(data.chat_to_user);
+                $("input[name='last_chat_id_new']").val(data.user_last_chat.id);
+                $('.messages ul').animate({
+                    scrollTop: $('.messages ul')[0].scrollHeight}, "slow"
+                );
+						
+                //clearInterval(interval);
+                //interval = setInterval(getrecentchat, 2000);
+            }
+        });
+	}
+	else
+	{
+	
+$(".messages ul").html("<li>Please select Team member</li>");	
+		
+		
+	}
+ 
+	
+}
+
+/*----------------GET CHAT BOX  FROM SELECT TAG END HERE----------------------------------*/	
+
+
+/*----------------WHEN USER CLICK ON RECENT CHAT USERLIST AND CHOOSE USER FOR CHAT END HERE--------*/
+
+$(document).on('click', '.contact', function () 
+{
+	
+		$(".profile_photo img").remove();
+		 var jsondecode = $(this).data('chatConnectionId');
+		 var is_groupvalue = $(this).data('chatConnectionValue');
+		 $("input[name='contactid']").val(jsondecode);
+         $("input[name='contactvalue']").val(is_groupvalue);
+		 var $this = $(this);
+         var optvalue=jsondecode;
+	     if(optvalue!='')
+	     {
+	     $.ajax({
+            type: "POST",
+            url: purl+'chat/getChatRecordweb',
+            data: {'chat_connection_id': optvalue,'is_groupvalue':is_groupvalue},
+            dataType: "JSON",
+            success: function (data) {
+				chatbox(".chatbox-popup, .chatbox-open, .chatbox-close").fadeOut();
+	 chatbox(".chatbox-panel").fadeIn();
+    chatbox(".chatbox-panel").css({ display: "flex" });
+	
+	
+                $(".messages ul").html(data.page);
+				var fullname=data.fullname;
+				if(data.isgroup>0){
+					
+				$(".profile_photo img").remove();
+				var matches = fullname.match(/\b(\w)/g);
+				var acronym = matches.join("");
+				$(".profile_photo").append("<div class='groupIcon'><div class='groupText'>" +acronym +"</div></div>"
+          );	
+					
+				$("#chatusername").html("<a id='updategroupdata' name='updategroupdata' onclick='updategroupdata("+data.chat_connection_id+","+data.groupid+",this)' data-id="+data.chat_connection_id+" href='javascript:void(0)'>"+fullname+"</a>");
+				}else
+				{
+				 $(".profile_photo div").remove();
+          $(".profile_photo").append(
+            "<img style='height: 40px;width: 40px;border-radius: 100%' src=" +
+              purl +
+              "'assets/img/no_image.png'>"
+          );	
+					
+				$("#chatusername").html(fullname);	
+					
+				}
+				var img="";
+					if(data.photo!=''){
+
+					img = purl+"upload/"+data.photo;
+					}
+					else
+					{
+					img = purl+"assets/img/no_image.png";	                        
+					}
+				 $('.profile_photo').find('img').attr("src", img);
+				 $('.profile_photo').css('width','40px');
+				 $('.profile_photo').css('height','40px');
+                $("input[name='chat_connection_id_new']").val(data.chat_connection_id);
+                $("input[name='chat_to_user_new']").val(data.chat_to_user);
+                $("input[name='last_chat_id_new']").val(data.user_last_chat.id);
+                $('.messages ul').animate({
+                    scrollTop: $('.messages ul')[0].scrollHeight}, "slow"
+                );
+				//clearInterval(interval);
+                //interval = setInterval(getChatsUpdates, 2000);
+            }
+        });
+	}
+	else
+	{
+	
+$(".messages ul").html("<li>Please select Team member</li>");	
+		
+		
+	}
+	   
+    });
+
+
+
+/*----------------WHEN USER CLICK ON RECENT CHAT USERLIST AND CHOOSE USER FOR CHAT END HERE--------*/	
+/*----------------GET USER LIST FUNCTION FOR SELECT TAG START HERE----------------------------------*/
+
+$(".groupchatcreate").click(function(event){
+
+ $("#searchchatusersmsg").empty();
+	  $("#group_namemsg").empty();
+ $("input[name='contactid']").val(0);
+ $("input[name='contactvalue']").val(0);
+ $("input[name='clickonicon']").val(1);
+
+ //recentchatlist();
+  var clickonicon_new = $("input[name='clickonicon']").val();
+ 
+	if(clickonicon_new>0)
+	{
+		$("#newgroupname").val("");
+		$("#getuserchatforgroup option").remove();
+
+  $.ajax({
+            type: "POST",
+            url: purl+'chat/myuserforweb',
+            data: {1:1},
+            dataType: "JSON",
+            success: function (data) 
+			{
+				
+			chatbox(".chatbox-panel_group").fadeIn();
+			chatbox(".chatbox-popup,.chatbox-popup__main").fadeOut();
+			
+		// chatbox(".chatbox-popup").css({ display: "none" });
+		// chatbox(".chatbox-panel_group1").css({ display: "flex" });
+			$('#getuserchatforgroup').append(data.employeelist);
+			// console.clear();
+	
+	
+	 }
+	 });
+	 
+	}
+				$("input[name='chat_connection_id_new']").val(0);
+				
+                $("input[name='chat_to_user_new']").val(0);
+                $("input[name='last_chat_id_new']").val(0);	
+				$("input[name='clickonicon']").val(0);	
+	
+	
+				
+});	
+
+
+
+	
+/*----------------GET USER LIST FUNCTION FOR SELECT TAG END HERE----------------------------------*/
+/*-----------------CREATE NEW GROUP -------------------------------------------------------------*/
+
+
+$("#createnewgroupfromlive").on('submit',function(event){
+      event.preventDefault();
+	  $(".profile_photo img").remove();
+	  $("#searchchatusersmsg").empty();
+	  $("#group_namemsg").empty();
+	  $("#chatgroupstatus").html("");
+	 
+      var str=true;
+      var searchchatusers=$("#getuserchatforgroup").val();
+      var group_name=$("#newgroupname").val();
+      
+      if(searchchatusers==''){
+         $("#searchchatusersmsg").html("Select minimum 1 user");
+         str=false;
+      }
+      if(group_name==''){
+         $("#group_namemsg").html("Please enter group name");
+         str=false;
+      }
+	   if(str){
+		  
+		 $.ajax( {
+               url: purl+'chat/createnewchatgroup',
+               type: 'post',
+               data: new FormData(this),
+               contentType: false,   
+			   cache: false,             
+			   processData:false, 
+               beforeSend: function(){
+                           
+						   },
+               success:function(response) {
+				
+				var data = $.parseJSON(response);
+				$("input[name='chat_connection_id_new']").val(data.chat_connection_id);
+				
+                $("input[name='chat_to_user_new']").val(data.chat_to_user);
+                $("input[name='last_chat_id_new']").val(data.user_last_chat.id); 
+			
+				chatbox(".chatbox-popup, .chatbox-open, .chatbox-close,.chatbox-panel_group").fadeOut();
+				chatbox(".chatbox-panel").fadeIn();
+				chatbox(".chatbox-panel").css({ display: "flex" });
+				$("#chatusername").html("");
+				$("#groupidvalue").val(data.groupid);
+				$("#groupoldname").val(data.fullname);
+				var datafullname = data.fullname;
+        $(".profile_photo img").remove();
+        var matches = datafullname.match(/\b(\w)/g);
+        var acronym = matches.join("");
+        $(".profile_photo").append(
+          "<div class='groupIcon'><div class='groupText'>" +
+            acronym +
+            "</div></div>"
+        );
+				
+				
+                $("#chatusername").html("<a onclick='updategroupdata("+data.chat_connection_id+","+data.groupid+",this)' id='updategroupdata' name='updategroupdata' href='javascript:void(0)'>"+data.fullname+"</a>");
+				
+				
+				
+				console.log(purl);		
+				img = purl+"assets/img/no_image.png";	
+					
+				 $('.profile_photo').find('img').attr("src", img);
+				$(".messages ul").html(data.page);
+				$('#getuserchatforgroup').val(null).trigger('change');
+				$('#createnewgroupfromlive')[0].reset();
+					
+                 
+			   }
+		 
+         });
+		 
+
+      }
+	                    
+                        
+                       
+});
+
+
+/*---------------------------------------CREATE NEW GROUP ---------------------------------------*/
+/*------------------------------GET GROUP DETAILS FOR UPDATE GROUP START HERE -------------------------*/
+
+function updategroupdata(connectionid,groupid,object)
+{
+	$('#updategetuserchatforgroup option').remove();
+	
+	$("#updategroup_namemsg").empty();
+	$("#updatesearchchatusersmsg").empty();
+	
+	var groupname=object.text;
+	if(connectionid>0)
+		{
+		 
+		 $.ajax({
+            type: "POST",
+            url: purl+'chat/getgroupdata',
+            data: {"connectionid":connectionid},
+            dataType: "JSON",
+            success: function (data) 
+			{
+				$('#updatechatconnection_id').val(connectionid);
+				$('#updategroupname').val(groupname);
+				$('#groupoldname').val(groupname);
+				$("#groupidvalue").val(groupid);
+				
+				$('#updategetuserchatforgroup').append(data.employeelist);
+				chatbox(".chatbox-panel_updategroup,.chatbox-open, .chatbox-close").fadeIn();
+				chatbox(".chatbox-popup,.chatbox-popup__main,.chatbox-panel").fadeOut();
+				
+			}
+         });
+		 	
+
+}
+
+}
+
+/*------------------------------GET GROUP DETAILS FOR UPDATE GROUP END HERE -------------------------*/
+
+
+/*------------------------------GROUP DETAILS UPDATED START HERE -------------------------*/
+
+$("#updatenewgroupfromlive").on('submit',function(event){
+      event.preventDefault();
+		
+		 $(".profile_photo img").remove();
+		$("#updatechatgroupstatus").html("");
+	  
+	  $("#updategroup_namemsg").empty();
+	$("#updatesearchchatusersmsg").empty();
+	
+	  
+      var str=true;
+      var searchchatusers=$("#updategetuserchatforgroup").val();
+      var group_name=$("#updategroupname").val();
+      
+      if(searchchatusers==''){
+         $("#updatesearchchatusersmsg").html("Select minimum 1 user");
+         str=false;
+      }
+      if(group_name==''){
+         $("#updategroup_namemsg").html("Please enter group name");
+         str=false;
+      }
+	   if(str){
+		  
+		 $.ajax( {
+               url: purl+'chat/updatechatgroup',
+               type: 'post',
+               data: new FormData(this),
+               contentType: false,   
+			   cache: false,             
+			   processData:false, 
+               beforeSend: function(){
+                           
+						   },
+               success:function(response) {
+				   
+				   var data = $.parseJSON(response);
+				 console.log(data);
+				chatbox(".chatbox-popup, .chatbox-open,.chatbox-close,.chatbox-panel_group,.chatbox-panel_updategroup").fadeOut();
+				chatbox(".chatbox-panel").fadeIn();
+				
+				chatbox(".chatbox-panel").css({ display: "flex" });
+				$(".messages ul").html(data.page);
+				
+				
+				$("#chatusername").html("");
+				
+				 var groupname = data.fullname;
+        var matches = groupname.match(/\b(\w)/g);
+        var acronym = matches.join("");
+        $(".profile_photo").append(
+          "<div class='groupIcon'><div class='groupText'>" +
+            acronym +
+            "</div></div>"
+        );
+				
+				 $("#chatusername").html("<a onclick='updategroupdata("+data.chat_connection_id+","+data.groupid+",this)' id='updategroupdata' name='updategroupdata' href='javascript:void(0)'>"+data.fullname+"</a>");
+				 
+				 
+				
+				img = purl+"assets/img/no_image.png";	                        
+				$('.contact-profile').find('img').attr("src", img);
+					
+                $("input[name='chat_connection_id_new']").val(data.chat_connection_id);
+                $("input[name='chat_to_user_new']").val(data.chat_to_user);
+				$("input[name='last_chat_id_new']").val(data.user_last_chat.id);
+                $('.messages').animate({
+                         scrollTop: $('.messages')[0].scrollHeight}, "slow"
+                            );
+				//$("#getuserchat option").remove();
+				 // setTimeout(function(){
+                                                  // location.reload();
+                                              // },1000);
+				$('#updatesearchchatusers').val(null).trigger('change');
+				$('#updatenewgroupfromlive')[0].reset();
+				 getChatsUpdates();
+			   }
+		 
+         });
+		 
+
+      }
+	                    
+                        
+                       
+});
+
+function getChatsUpdates() {
+		 var jsondecode=$("input[name='contactid']").val();
+		 var is_groupvalue =$("input[name='contactvalue']").val();
+		 console.log(jsondecode);
+		
+       
+		
+		var end_reach = false;
+        var chat_connection_id = $("input[name='chat_connection_id_new']").val();
+        var chat_to_user = $("input[name='chat_to_user_new']").val();
+        var last_chat_id = $("input[name='last_chat_id_new']").val();
+		
+		if(last_chat_id>0)
+		{
+		
+		$.ajax({
+            type: "POST",
+            url: purl+'chat/chatUpdate',
+            data: {'chat_connection_id': chat_connection_id, 'chat_to_user': chat_to_user, 'last_chat_id': last_chat_id,'contactid':jsondecode,'contactvalue':is_groupvalue},
+            dataType: "JSON",
+            beforeSend: function () {
+			$('.messages ul').append("");
+            },
+            success: function (data) { 
+			
+			console.log(data);
+				
+			   var scrollTop = $('.messages ul').scrollTop();
+                if (scrollTop + $('.messages ul').innerHeight() >= $('.messages ul')[0].scrollHeight) {
+                    end_reach = true;
+                }
+				$("input[name='last_chat_id_new']").val(data.user_last_chat.id);
+				$('.messages ul').append(data.page);
+                if (end_reach) {
+                    $('.messages ul').animate({
+                        scrollTop: $('.messages ul')[0].scrollHeight}, "slow");
+				
+                }
+				 
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+
+            },
+            complete: function (data) {
+
+            }
+        });
+		}
+    }
+	$(document).ready(function() {
+
+  $('.chatboxzoomFix').click(function (e) {
+document.querySelector('meta[name="viewport"]').content = 'width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0';
+});
+});  
+
+/*------------------------------GROUP DETAILS UPDATED END HERE -------------------------*/
+
+$(document).ready(function() {
+
+
+
+    $('.js-example-basic-multiple_chat').select2({
+
+     dropdownParent: $('.singlesearchuserlist'),
+	 placeholder: "Search Team Member For Chat",
+	 
+
+    });
+	
+	
+	 $('.js-example-basic-multiple_groupchat').select2({
+	 dropdownParent: $('.updategroupSelect'),
+	 placeholder: "Add Users In Group",
+
+    });
+	
+	
+	    $('.js-example-basic-multiple_groupchats').select2({
+
+     dropdownParent: $('.createnewgroupfromlive'),
+	 placeholder: "Add Users In Group",
+	 
+
+    });
+	
+	
+	
+
+});
+$(document).ready(function() {
+
+$(".singlesearchuserlist .select2-container").addClass("chatselectBox");
+$(".updategroupSelect .select2-container").addClass("chatselectBox");
+$("#createnewgroupfromlive .select2-container").addClass("chatselectBox");
+
+
+});

@@ -1,0 +1,32 @@
+/*
+ * Tailwind CSS v4 setup — simple, koi tailwind.config ki zaroorat nahi.
+ * source(none) + @source sirf src/ scan karta hai (reference folder ke
+ * purane CSS files se garbage classes generate nahi hongi).
+ */
+@import "tailwindcss" source(none);
+@source "../**/*.{ts,tsx}";
+
+/*
+ * THEME TOKENS → Tailwind utilities.
+ * ThemeProvider (src/theme/ThemeProvider.tsx) runtime par ye --color-*
+ * variables set karta hai; isliye yahan utilities ban gayi:
+ *   bg-surface · text-muted · border-border · bg-primary ...
+ * Components mein hard-coded hex rang KABHI nahi likhna —
+ * isi se 6 themes bina duplicate components ke switch hoti hain.
+ */
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-primary-contrast: var(--color-primary-contrast);
+  --color-secondary: var(--color-secondary);
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-text: var(--color-text);
+  --color-muted: var(--color-muted);
+  --color-border: var(--color-border);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: var(--color-info);
+  --color-focus: var(--color-focus);
+}
