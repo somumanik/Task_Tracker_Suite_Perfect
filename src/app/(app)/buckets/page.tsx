@@ -1,12 +1,17 @@
-import PagePlaceholder from '@/components/PagePlaceholder';
+import type { Metadata } from 'next';
+import BucketsView from '@/components/tasks/BucketsView';
 
-/** Buckets — task groups (projects/categories) ka board (functionality Phase 2). */
+export const metadata: Metadata = {
+  title: 'Buckets',
+};
+
+/**
+ * Buckets — tasks ke groups (Phase 3A).
+ *
+ * Page (server) sirf compose karta hai; "Create Bucket" modal ka state
+ * BucketsView (client) mein hai. Modal abhi sirf UI hai — koi DB/API
+ * connection nahi (bucket local state mein add hota hai).
+ */
 export default function BucketsPage() {
-  return (
-    <PagePlaceholder
-      title="Buckets"
-      description="Buckets group your tasks like projects or categories — create a bucket, then add tasks inside it."
-      phase="Phase 2"
-    />
-  );
+  return <BucketsView />;
 }

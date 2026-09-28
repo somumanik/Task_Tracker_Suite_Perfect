@@ -32,8 +32,12 @@ export interface ActivityItem {
 /** Demo user — auth phase ke baad session se aayega. */
 export const CURRENT_USER = 'Demo User';
 
-/** Local timezone ke hisaab se ISO date (UTC bug se bachne ke liye). */
-function isoDate(offsetDays: number): string {
+/**
+ * Local timezone ke hisaab se ISO date (UTC bug se bachne ke liye).
+ * Phase 3A ka taskData.ts bhi isi helper ko reuse karta hai — date ka
+ * logic ek hi jagah rehta hai (duplicate nahi hota).
+ */
+export function isoDate(offsetDays: number): string {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
   const y = d.getFullYear();
